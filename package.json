@@ -1,0 +1,15 @@
+{
+  "name": "authenticatedapp",
+  "version": "1.0.0",
+  "description": "A simple authenticated express app using JWT and custom middlewares",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
