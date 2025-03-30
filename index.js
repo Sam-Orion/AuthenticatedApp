@@ -16,9 +16,14 @@ const users = [];
 //     return token;
 // }
 
-const JWT_SECRET = "USER_APP";
+const JWT_SECRET = "HelloWorld";
 
-app.post("/signup", function(req, res) {
+function logger(req, res, next) {
+    console.log(`${req.method} request came`);
+    next();
+}
+
+app.post("/signup", logger, function(req, res) {
     const username = req.body.username;
     const password = req.body.password;
 
@@ -39,7 +44,7 @@ app.post("/signup", function(req, res) {
     })
 });
 
-app.post("/signin", function(req, res) {
+app.post("/signin", logger, function(req, res) {
 
     const username = req.body.username;
     const password = req.body.password;
@@ -51,6 +56,9 @@ app.post("/signin", function(req, res) {
             username: user.username
         }, JWT_SECRET);
         user.token = token;
+        res.header({
+            "jwt": token
+        })
         res.send({
             token
         })
@@ -63,20 +71,38 @@ app.post("/signin", function(req, res) {
 
 });
 
-app.get("/me", (req, res) => {
-    const token = req.headers.authorization;
-    const userDetail = jwt.verify(token, JWT_SECRET);
-    const username = userDetail.username;
+function auth(req, res, next) {
+    const token = req.headers.token;
+    const decodeData = jwt.verify(token, JWT_SECRET);
+    if (decodeData.username) {
+        req.username = decodeData.username;
+        next();
+    } else {
+        res.status(401).send({
+            message: "Unauthorised"
+        })
+    }
+}
+
+app.get("/me", logger, auth, (req, res) => {
+    // const token = req.headers.token;
+    // const userDetail = jwt.verify(token, JWT_SECRET);
+    const username = req.username;
     const user = users.find(user => user.username === username);
     if (user) {
         res.send({
-            username: user.username
+            username: user.username,
+            password: user.password
         })
     } else {
         res.status(401).send({
             message: "Unauthorised"
         })
     }
-})
+});
+
+app.get("/profile", auth, (req, res) => {
+
+});
 
 app.listen(3000);
