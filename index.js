@@ -23,6 +23,12 @@ function logger(req, res, next) {
     next();
 }
 
+
+// to prevent CORS
+app.get("/", (req, res) => {
+    res.sendFile(__dirname + "/public/index.html");
+});
+
 app.post("/signup", logger, function(req, res) {
     const username = req.body.username;
     const password = req.body.password;
